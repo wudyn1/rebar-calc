@@ -1,0 +1,2149 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+
+
+<meta charset="UTF-8">
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+
+<title>钢筋翻样计算器 - 台山核电专用版</title>
+
+
+<meta name="theme-color" content="#0d1117">
+
+
+<meta name="mobile-web-app-capable" content="yes">
+
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+
+<meta name="apple-mobile-web-app-title" content="钢筋翻样计算器">
+
+
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d7377'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>钢</text></svg>">
+
+
+<script>
+// PWA Manifest (inline)
+(function(){
+  var manifest={
+    name:'钢筋翻样计算器',
+    short_name:'翻样计算',
+    description:'台山核电专用钢筋翻样计算器',
+    start_url:location.href.split('?')[0],
+    display:'standalone',
+    orientation:'any',
+    background_color:'#0d1117',
+    theme_color:'#0d7377',
+    icons:[
+      {src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d7377'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>钢</text></svg>",sizes:'192x192',type:'image/svg+xml'},
+      {src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d7377'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>钢</text></svg>",sizes:'512x512',type:'image/svg+xml'}
+    ]
+  };
+  var blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var link=document.createElement('link');
+  link.rel='manifest';
+  link.href=url;
+  document.head.appendChild(link);
+})();
+</script>
+
+
+<style>
+
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+
+body{font-family:'Microsoft YaHei',sans-serif;background:#0d1117;color:#e6edf3;min-height:100vh;padding:16px}
+
+
+.header{text-align:center;margin-bottom:20px}
+
+
+.header h2{color:#4fc3f7;font-size:1.1em;margin-bottom:6px}
+
+
+.contact{color:#4fc3f7;font-size:0.75em;margin-top:6px}
+
+
+.contact a{color:#4fc3f7;text-decoration:none}
+
+
+.mode-bar{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+
+
+.mode-btn{padding:8px 14px;border:1px solid #30363d;border-radius:6px;background:#161b22;color:#e6edf3;cursor:pointer;font-size:0.9em;transition:all .2s}
+
+
+.mode-btn:hover{border-color:#4fc3f7}
+
+
+.mode-btn.active{background:#1c3a5e;border-color:#4fc3f7;color:#4fc3f7;font-weight:bold}
+
+
+.aux-row{display:flex;gap:10px;justify-content:center;margin-bottom:16px;min-height:34px;align-items:center}
+
+
+.label{color:#8b949e;font-size:0.85em;white-space:nowrap}
+
+
+select{padding:6px 10px;background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:5px;font-size:0.85em;outline:none}
+
+
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px 16px;margin-bottom:12px}
+
+
+.card-title{font-size:0.8em;color:#8b949e;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+
+
+.input-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+
+
+.input-row label{color:#c9d1d9;font-size:0.85em;white-space:nowrap}
+
+
+input[type=number]{width:90px;padding:7px 10px;background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:5px;font-size:0.9em;outline:none}
+
+
+input[type=number]:focus{border-color:#4fc3f7}
+
+
+.buttons{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+
+
+.calc-btn{padding:8px 14px;border:1px solid #30363d;border-radius:6px;background:#21262d;color:#e6edf3;cursor:pointer;font-size:0.85em;font-family:inherit}
+
+
+.calc-btn:hover{background:#2d333b;border-color:#4fc3f7}
+
+
+.result-box{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:12px;font-size:0.88em;min-height:52px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+
+.result-val{color:#4fc3f7;font-weight:bold;font-size:1.1em}
+
+
+.result-unit{color:#8b949e;font-size:0.85em}
+
+
+.result-note{color:#8b949e;font-size:0.75em;margin-top:4px;width:100%}
+
+
+.mode-tip{text-align:center;color:#484f58;font-size:0.72em;margin:8px 0 2px}
+
+
+.mode-tip span{color:#7d8590}
+
+
+/* 普通计算器 */
+
+
+#calcCard{display:none}
+
+
+#calcCard textarea{width:100%;height:70px;background:#21262d;color:#4fc3f7;border:1px solid #30363d;border-radius:5px;padding:8px;font-family:monospace;font-size:1.1em;resize:none;margin-bottom:8px}
+
+
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+
+
+.calc-key{padding:12px;border:1px solid #30363d;border-radius:6px;background:#21262d;color:#e6edf3;cursor:pointer;font-size:1em;font-family:inherit;text-align:center}
+
+
+.calc-key:hover{background:#2d333b;border-color:#4fc3f7}
+
+
+.calc-key.op{background:#1c3a5e;color:#4fc3f7;border-color:#4fc3f7}
+
+
+.calc-key.eq{background:#1a472a;color:#56d364;border-color:#56d364}
+
+
+.calc-key.clear{background:#3a1a1a;color:#f85149;border-color:#f85149}
+
+
+.footer{text-align:center;color:#484f58;font-size:0.68em;margin-top:20px;padding-bottom:16px}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+
+
+
+<div class="header">
+
+
+  <h2>钢筋翻样计算器 · 台山核电专用版</h2>
+
+
+  <p class="contact">如有问题或建议，请联系益哥 <a href="tel:13249304389">13249304389</a></p>
+
+
+</div>
+
+
+
+
+
+<div class="mode-bar">
+
+
+  <button class="mode-btn active" onclick="setMode('nuclear')">切换核岛</button>
+
+
+  <button class="mode-btn" onclick="setMode('ci')">切换常规岛</button>
+
+
+  <button class="mode-btn" onclick="setMode('gbt')">切换国标</button>
+
+
+  <button class="mode-btn" onclick="setMode('calc')">普通计算器</button>
+
+
+</div>
+
+
+
+
+
+<div class="aux-row" id="auxRow"></div>
+
+
+
+
+
+<!-- 弯曲心轴卡片 -->
+
+
+<div class="card" id="pinCard">
+
+
+  <div class="card-title">① 弯曲心轴直径（弯弧内径）</div>
+
+
+  <div class="input-row">
+
+
+    <label>钢筋级别</label>
+
+
+    <select id="pinSteel" onchange="updatePinResult()">
+
+
+      <option value="HRB500E">HRB500E</option>
+
+
+      <option value="HRB400E">HRB400E</option>
+
+
+      <option value="HPB300">HPB300</option>
+
+
+    </select>
+
+
+    
+
+
+  </div>
+
+
+  <div class="input-row">
+
+
+    <label>钢筋直径 d (mm)</label>
+
+
+    <input type="number" id="pinDia" min="6" max="50" value="25" oninput="updatePinResult()">
+
+
+  </div>
+
+
+  <div class="result-box">
+
+
+    <span class="result-val" id="pinResult">—</span>
+
+
+    <span class="result-unit">mm</span>
+
+
+    <span class="result-note" id="pinNote"></span>
+
+
+  </div>
+
+
+</div>
+
+
+
+
+
+<!-- 锚固搭接长度卡片 -->
+
+
+<div class="card" id="ancCard">
+
+
+  <div class="card-title">② 锚固 / 搭接长度</div>
+
+
+  <div class="input-row">
+
+
+    <label>钢筋级别</label>
+
+
+    <select id="ancSteel" onchange="updateAncResult()">
+
+
+      <option value="HRB500E">HRB500E</option>
+
+
+      <option value="HRB400E">HRB400E</option>
+
+
+      <option value="HPB300">HPB300</option>
+
+
+    </select>
+
+
+    <label style="margin-left:6px">混凝土</label>
+
+
+    <select id="ancConc" onchange="updateAncResult()">
+
+
+      <option value="C25">C25</option>
+
+
+      <option value="C30">C30</option>
+
+
+      <option value="C35">C35</option>
+
+
+      <option value="C40">C40</option>
+
+
+      <option value="C45">C45</option>
+
+
+      <option value="C50">C50</option>
+
+
+      <option value="C55">C55</option>
+
+
+      <option value="C60">C60</option>
+
+
+    </select>
+
+
+  </div>
+
+
+  <div class="input-row">
+
+
+    <label>钢筋直径 d (mm)</label>
+
+
+    <input type="number" id="ancDia" min="6" max="50" value="25" oninput="updateAncResult()">
+
+
+    <label style="margin-left:10px" id="seismicLabel">抗震等级</label>
+
+
+    <select id="ancSeismic" onchange="updateAncResult()" style="display:none">
+
+
+      <option value="4">四级抗震 (la)</option>
+
+
+      <option value="12">一、二级抗震 (laE)</option>
+
+
+      <option value="3">三级抗震 (laE)</option>
+
+
+    </select>
+
+
+    <label style="margin-left:10px">接头面积</label>
+
+
+    <select id="ancJtype" onchange="updateAncResult()">
+
+
+      <option value="la">锚固长度</option>
+
+
+      <option value="lap25">搭接（25%）</option>
+
+
+      <option value="lap50">搭接（50%）</option>
+
+
+      <option value="lap100">搭接（100%）</option>
+
+
+    </select>
+
+
+  </div>
+
+
+  <div class="result-box">
+
+
+    <span class="result-val" id="ancResult">—</span>
+
+
+    <span class="result-unit">mm</span>
+
+
+    <span class="result-note" id="ancNote"></span>
+
+
+  </div>
+
+
+</div>
+
+
+
+
+
+<!-- 弯钩外皮尺寸卡片 -->
+
+
+<div class="card" id="hookCard">
+
+
+  <div class="card-title">③ 弯钩外皮尺寸</div>
+
+
+  <div class="input-row">
+
+
+    <label>钢筋级别</label>
+
+
+    <select id="hookSteel" onchange="updateHookResult()">
+
+
+      <option value="HRB500E">HRB500E</option>
+
+
+      <option value="HRB400E">HRB400E</option>
+
+
+      <option value="HPB300">HPB300</option>
+
+
+    </select>
+
+
+    
+
+
+  </div>
+
+
+  <div class="input-row">
+
+
+    <label>钢筋直径 d (mm)</label>
+
+
+    <input type="number" id="hookDia" min="6" max="50" value="25" oninput="updateHookResult()">
+
+
+    <label style="margin-left:10px">弯钩角度</label>
+
+
+    <select id="hookAngle" onchange="updateHookResult()">
+
+
+      <option value="90">90°</option>
+
+
+      <option value="135">135°</option>
+
+
+      <option value="180">180°</option>
+
+
+    </select>
+
+
+  </div>
+
+
+  <div class="result-box">
+
+
+    <span class="result-val" id="hookResult">—</span>
+
+
+    <span class="result-unit">mm</span>
+
+
+    <span class="result-note" id="hookNote"></span>
+
+
+  </div>
+
+
+</div>
+
+
+
+
+
+<!-- 普通计算器 -->
+
+
+<div id="calcCard">
+
+
+  <textarea id="calcDisplay" readonly placeholder="运算结果"></textarea>
+
+
+  <div class="calc-grid">
+
+
+    <div class="calc-key clear" onclick="calcC()">C</div>
+
+
+    <div class="calc-key clear" onclick="calcBack()">⌫</div>
+
+
+    <div class="calc-key op" onclick="calcOp('(')">(</div>
+
+
+    <div class="calc-key op" onclick="calcOp(')')">)</div>
+
+
+    <div class="calc-key" onclick="calcNum('7')">7</div>
+
+
+    <div class="calc-key" onclick="calcNum('8')">8</div>
+
+
+    <div class="calc-key" onclick="calcNum('9')">9</div>
+
+
+    <div class="calc-key op" onclick="calcOp('/')">÷</div>
+
+
+    <div class="calc-key" onclick="calcNum('4')">4</div>
+
+
+    <div class="calc-key" onclick="calcNum('5')">5</div>
+
+
+    <div class="calc-key" onclick="calcNum('6')">6</div>
+
+
+    <div class="calc-key op" onclick="calcOp('*')">×</div>
+
+
+    <div class="calc-key" onclick="calcNum('1')">1</div>
+
+
+    <div class="calc-key" onclick="calcNum('2')">2</div>
+
+
+    <div class="calc-key" onclick="calcNum('3')">3</div>
+
+
+    <div class="calc-key op" onclick="calcOp('-')">−</div>
+
+
+    <div class="calc-key" onclick="calcNum('0')">0</div>
+
+
+    <div class="calc-key" onclick="calcNum('.')">.</div>
+
+
+    <div class="calc-key" onclick="calcEval()">=</div>
+
+
+    <div class="calc-key op" onclick="calcOp('+')">+</div>
+
+
+    <div class="calc-key" onclick="calcSqrt()">√</div>
+
+
+    <div class="calc-key" onclick="calcOp('**2')">x²</div>
+
+
+    <div class="calc-key" onclick="calcOp('**')">xʸ</div>
+
+
+    <div class="calc-key" onclick="calcPi()">π</div>
+
+
+  </div>
+
+
+</div>
+
+
+
+
+
+<div class="footer">台山核电二期 3/4号机组 · 仅供参考，以项目规范为准</div>
+
+
+
+
+
+<script>
+
+
+// ============================================================
+
+
+// 数据定义
+
+
+// ============================================================
+
+
+
+
+
+// ---- 核岛弯曲心轴表（mm）仅核岛 ----
+
+
+// 格式: nuclearPinData[钢筋级别][用途][直径] = mm
+
+
+var nuclearPinData = {
+
+
+  "HRB500E": {
+
+
+    "main":   {8:50,10:60,12:72,14:90,16:100,20:120,25:150,32:260,40:320},
+
+
+    "stirrup":{8:40,10:50,12:60,14:70,16:80,20:120,25:150,32:260,40:320}
+
+
+  },
+
+
+  "HRB400E": {
+
+
+    "main":   {8:50,10:60,12:72,14:90,16:100,20:120,25:150,32:260,40:320},
+
+
+    "stirrup":{8:40,10:50,12:60,14:70,16:80,20:120,25:150,32:260,40:320}
+
+
+  },
+
+
+  "HPB300": {
+
+
+    "main":   {8:50,10:60,12:72,14:90,16:100,20:120,25:150,32:260,40:320},
+
+
+    "stirrup":{8:32,10:40,12:48,14:56,16:64,20:120,25:150,32:260,40:320}
+
+
+  }
+
+
+};
+
+
+
+
+
+// ---- 核岛锚固/搭接长度表（mm）仅核岛 ----
+
+
+// 格式: nuclearAnchData[混凝土][钢筋级别][直径] = [锚固, 搭接≤50%, 搭接>50%]
+
+
+var nuclearAnchData = {
+
+
+  "C40": {
+
+
+    "HPB300":  {6:[200,250,300],8:[250,350,400],10:[300,450,500],12:[350,500,600],14:[450,600,650],16:[500,650,750]},
+
+
+    "HRB400E": {8:[300,400,450],10:[350,500,550],12:[400,600,650],14:[500,650,750],16:[550,750,850],20:[700,950,1100],25:[850,1200,1350],32:[1200,1700,1900],40:[1500,2100,2400]},
+
+
+    "HRB500E": {8:[350,500,550],10:[450,600,700],12:[500,700,800],14:[600,850,950],16:[700,950,1050],20:[850,1150,1350],25:[1050,1450,1650],32:[1500,2100,2400],40:[1850,2600,2950]}
+
+
+  },
+
+
+  "C45": {
+
+
+    "HPB300":  {6:[200,250,300],8:[250,350,400],10:[300,450,500],12:[350,500,600],14:[450,600,650],16:[500,650,750]},
+
+
+    "HRB400E": {8:[300,400,450],10:[350,500,550],12:[400,600,650],14:[500,650,750],16:[550,750,850],20:[700,950,1100],25:[850,1200,1350],32:[1200,1700,1900],40:[1500,2100,2400]},
+
+
+    "HRB500E": {8:[350,500,550],10:[450,600,700],12:[500,700,800],14:[600,850,950],16:[700,950,1050],20:[850,1150,1350],25:[1050,1450,1650],32:[1500,2100,2400],40:[1850,2600,2950]}
+
+
+  },
+
+
+  "C50": {
+
+
+    "HPB300":  {6:[200,250,250],8:[250,300,350],10:[300,400,450],12:[350,450,500],14:[400,550,600],16:[450,600,700]},
+
+
+    "HRB400E": {8:[250,350,400],10:[350,450,500],12:[400,550,600],14:[450,650,700],16:[500,650,800],20:[650,900,1000],25:[800,1100,1250],32:[1150,1600,1800],40:[1400,2000,2250]},
+
+
+    "HRB500E": {8:[300,450,500],10:[400,550,600],12:[450,650,750],14:[550,750,850],16:[600,850,950],20:[750,1050,1200],25:[950,1300,1500],32:[1300,1800,2050],40:[1600,2250,2600]}
+
+
+  },
+
+
+  "C60": {
+
+
+    "HPB300":  {6:[150,250,250],8:[200,300,350],10:[250,350,400],12:[300,450,500],14:[350,500,550],16:[400,550,650]},
+
+
+    "HRB400E": {8:[250,350,400],10:[300,450,500],12:[350,500,600],14:[450,600,650],16:[500,650,750],20:[600,850,950],25:[750,1050,1200],32:[1050,1450,1650],40:[1300,1800,2050]},
+
+
+    "HRB500E": {8:[300,400,450],10:[350,500,600],12:[450,600,700],14:[500,700,800],16:[600,800,900],20:[700,1000,1150],25:[900,1250,1400],32:[1250,1750,1950],40:[1550,2150,2450]}
+
+
+  }
+
+
+};
+
+
+
+
+
+// ---- 常规岛廊道锚固长度表 ----
+
+
+// 格式: ciAnchData[组别][钢筋级别][混凝土等级][d分类] = d倍数
+
+
+var ciAnchData = {
+
+
+  "G1": { // 第一组：BGZ,BDL,BGU,BDG,BDH,BGF,BGR,BGT-1、2外
+
+
+    "HPB300": {
+
+
+      "C40":{le25:26},  "C45":{le25:25},  "C50":{le25:24},
+
+
+      "C55":{le25:23},  "C60":{le25:22}
+
+
+    },
+
+
+    "HRB400E": {
+
+
+      "C40":{le25:30,gt25:34},"C45":{le25:29,gt25:33},"C50":{le25:28,gt25:32},
+
+
+      "C55":{le25:27,gt25:30},"C60":{le25:26,gt25:29}
+
+
+    }
+
+
+  },
+
+
+  "G2": { // 第二组：BGA/B/C,BGL/M/N,BGH/I/J,BGT-1、2,BGK,BGE
+
+
+    "HPB300": {
+
+
+      "C40":{le25:29},  "C45":{le25:28},  "C50":{le25:26},
+
+
+      "C55":{le25:25},  "C60":{le25:24}
+
+
+    },
+
+
+    "HRB400E": {
+
+
+      "C40":{le25:33,gt25:37},"C45":{le25:32,gt25:36},"C50":{le25:31,gt25:35},
+
+
+      "C55":{le25:30,gt25:33},"C60":{le25:29,gt25:32}
+
+
+    }
+
+
+  }
+
+
+};
+
+
+
+
+
+// ---- 22G-101 弯曲心轴公式（常规岛+国标共用）----
+
+
+function gbtPin(steel, d) {
+
+
+  if (steel === "HPB300")  return Math.ceil(d * 2.5);
+
+
+  if (steel === "HRB400E") return Math.ceil(d * 4);
+
+
+  if (steel === "HRB500E") return d <= 25 ? Math.ceil(d * 6) : Math.ceil(d * 7);
+
+
+  return d * 4;
+
+
+}
+
+
+
+
+
+
+
+
+// ---- 国标22G-101 锚固/搭接长度查表 ----
+
+
+// la 表：[d<=25倍数, d>25倍数]（无d>25的填null）
+
+
+var gbtLaTable = {
+
+
+  "HPB300": {
+
+
+    C25:[34,null], C30:[30,null], C35:[28,null], C40:[25,null], C45:[24,null],
+
+
+    C50:[23,null], C55:[22,null], C60:[21,null]
+
+
+  },
+
+
+  "HRB400E": {
+
+
+    C25:[40,44], C30:[35,39], C35:[32,35], C40:[29,32], C45:[28,31],
+
+
+    C50:[27,30], C55:[26,29], C60:[25,28]
+
+
+  },
+
+
+  "HRB500E": {
+
+
+    C25:[48,53], C30:[43,47], C35:[39,43], C40:[36,40], C45:[34,37],
+
+
+    C50:[32,35], C55:[31,34], C60:[30,33]
+
+
+  }
+
+
+};
+
+
+// laE 表（抗震锚固）：[抗震等级][d<=25倍数, d>25倍数]
+
+
+var gbtLaETable = {
+
+
+  "HPB300": {
+
+
+    "12":[39,null,35,null,32,null,29,null,28,null,26,null,25,null,24,null],
+
+
+    "3" :[36,null,32,null,29,null,26,null,25,null,24,null,23,null,22,null]
+
+
+  },
+
+
+  "HRB400E": {
+
+
+    "12":[46,51,40,45,37,40,33,37,32,36,31,35,30,33,29,32],
+
+
+    "3" :[42,46,37,41,34,37,30,34,29,33,28,32,27,30,26,29]
+
+
+  },
+
+
+  "HRB500E": {
+
+
+    "12":[55,61,49,54,45,49,41,46,39,43,37,40,36,39,35,38],
+
+
+    "3" :[50,56,45,49,41,45,38,42,36,39,34,37,33,36,32,35]
+
+
+  }
+
+
+};
+
+
+// 混凝土等级顺序（la/laE表共用）
+
+
+var gbtConcOrder = ["C25","C30","C35","C40","C45","C50","C55","C60"];
+
+
+
+
+
+function gbtLookup(steel, dia, conc, jtype) {
+
+
+  var le25 = dia <= 25;
+
+
+  var idx = gbtConcOrder.indexOf(conc);
+
+
+  if (idx < 0) return null;
+
+
+
+
+
+  // Read seismic grade from selector
+
+
+  var seismicGrade = "4";
+
+
+  var seismicSel = document.getElementById("ancSeismic");
+
+
+  if (seismicSel) seismicGrade = seismicSel.value;
+
+
+
+
+
+  var laMult;
+
+
+  if (seismicGrade === "4") {
+
+
+    // Non-seismic: use gbtLaTable
+
+
+    var laRow = gbtLaTable[steel];
+
+
+    if (!laRow) return null;
+
+
+    var laCell = laRow[conc];
+
+
+    if (!laCell) return null;
+
+
+    laMult = le25 ? laCell[0] : (laCell[1] !== null && laCell[1] !== undefined ? laCell[1] : null);
+
+
+  } else {
+
+
+    // Seismic (laE): use gbtLaETable
+
+
+    var eRow = gbtLaETable[steel];
+
+
+    if (!eRow) return null;
+
+
+    var eArr = eRow[seismicGrade];
+
+
+    if (!eArr) return null;
+
+
+    var eIdx = idx * 2 + (le25 ? 0 : 1);
+
+
+    laMult = eArr[eIdx];
+
+
+  }
+
+
+  if (laMult === null || laMult === undefined) return null;
+
+
+  var laVal = dia * laMult;
+
+
+
+
+
+  if (jtype === "la") return Math.ceil(laVal);
+
+
+
+
+
+  // Lap multiplier
+
+
+  var lapMap = {lap:1.4, lap25:1.2, lap50:1.4, lap100:1.6};
+
+
+  var lm = lapMap[jtype];
+
+
+  if (!lm) lm = 1.4;
+
+
+  return Math.ceil(laVal * lm);
+
+
+}
+
+
+
+
+
+// ---- 核岛弯钩平直段（台山核电二期项目规范）----
+
+
+function nuclearHookStraight(steel, angle, dia) {
+
+
+  // HPB300 / HRB400E / HRB500E 相同
+
+
+  if (angle == 90)  return 12;
+
+
+  if (angle == 135) return 10;
+
+
+  if (angle == 180) return (dia && dia * 5 < 50) ? 50 / dia : 5;
+
+
+  return 12;
+
+
+}
+
+
+
+
+
+// ============================================================
+
+
+// 全局状态
+
+
+// ============================================================
+
+
+var currentMode = "nuclear";
+
+
+var calcExpr = "";
+
+
+
+
+
+// ============================================================
+
+
+// 模式切换
+
+
+// ============================================================
+
+
+function setMode(m) {
+
+
+  currentMode = m;
+
+
+  localStorage.setItem("rebarCalcMode", m);
+
+
+  updateModeUI();
+
+
+  // 刷新当前卡片结果
+
+
+  if (m === "calc") {
+
+
+    document.getElementById("calcDisplay").value = "";
+
+
+    calcExpr = "";
+
+
+  } else {
+
+
+    updatePinResult();
+
+
+    updateAncResult();
+
+
+    updateHookResult();
+
+
+  }
+
+
+}
+
+
+
+
+
+function updateModeUI() {
+
+
+  // 模式按钮高亮
+
+
+  document.querySelectorAll(".mode-btn").forEach(function(btn) {
+
+
+    btn.classList.remove("active");
+
+
+  });
+
+
+  var btns = document.querySelectorAll(".mode-btn");
+
+
+  if (currentMode === "nuclear") btns[0].classList.add("active");
+
+
+  else if (currentMode === "ci")     btns[1].classList.add("active");
+
+
+  else if (currentMode === "gbt")   btns[2].classList.add("active");
+
+
+  else if (currentMode === "calc")  btns[3].classList.add("active");
+
+
+
+
+
+  var isCalc = currentMode === "calc";
+
+
+
+
+
+  // 三卡片显示/隐藏
+
+
+  document.getElementById("pinCard").style.display  = isCalc ? "none" : "block";
+
+
+  document.getElementById("ancCard").style.display  = isCalc ? "none" : "block";
+
+
+  document.getElementById("hookCard").style.display = isCalc ? "none" : "block";
+
+
+  document.getElementById("calcCard").style.display = isCalc ? "block" : "none";
+
+
+
+
+
+  // 辅助行：核岛显示用途选择；常规岛显示廊道组选择；其他清空
+
+
+  var aux = document.getElementById("auxRow");
+
+
+  if (currentMode === "nuclear") {
+
+
+    aux.innerHTML = '<label class="label">用途&nbsp;</label>' +
+
+
+      '<select id="pinPurpose" onchange="updatePinResult()">' +
+
+
+      '<option value="main">主筋</option>' +
+
+
+      '<option value="stirrup">箍筋/拉筋</option></select>';
+
+
+  } else if (currentMode === "ci") {
+
+
+    aux.innerHTML = '<label class="label">廊道组&nbsp;</label>' +
+
+
+      '<select id="ciGroup" onchange="updateAncResult()">' +
+
+
+      '<option value="G1">第一组：BGZ、BDL、BGU、BDG、BDH、BGF、BGR、BGT-1、2外</option>' +
+
+
+      '<option value="G2">第二组：BGA/B/C、BGL/M/N、BGH/I/J、BGT-1、2、BGK、BGE</option></select>';
+
+
+  } else {
+
+
+    aux.innerHTML = "";
+
+
+  }
+
+
+
+
+
+  // 钢筋下拉选项过滤
+
+
+  updateSteelOptions();
+
+
+  updateAncJtypeOptions();
+
+
+}
+
+
+
+
+
+function updateSteelOptions() {
+
+
+  var steels = ["HRB500E","HRB400E","HPB300"];
+
+
+  var opts = {};
+
+
+  if (currentMode === "ci") {
+
+
+    opts = ["HRB400E","HPB300"];
+
+
+  } else {
+
+
+    opts = steels;
+
+
+  }
+
+
+  ["pinSteel","ancSteel","hookSteel"].forEach(function(selId) {
+
+
+    var sel = document.getElementById(selId);
+
+
+    if (!sel) return;
+
+
+    var cur = sel.value;
+
+
+    sel.innerHTML = "";
+
+
+    opts.forEach(function(s) {
+
+
+      var label = s;
+
+
+      var opt = document.createElement("option");
+
+
+      opt.value = s; opt.textContent = label;
+
+
+      sel.appendChild(opt);
+
+
+    });
+
+
+    // 恢复原选值或默认
+
+
+    sel.selectedIndex = 0;
+
+
+  });
+
+
+  filterDiaOptions();
+
+
+}
+
+
+// 动态过滤直径选项（Mod1）
+
+
+function filterDiaOptions() {
+
+
+  var steel = document.getElementById("pinSteel") ? document.getElementById("pinSteel").value : "";
+
+
+  var conc  = document.getElementById("pinConc")  ? document.getElementById("pinConc").value  : "";
+
+
+  var allDia = [6,8,10,12,14,16,18,20,22,25,28,32,36,40];
+
+
+  var nuclearDiaMap = {
+
+
+    "HPB300":  {C40:[6,8,10,12,14,16],C45:[6,8,10,12,14,16],C50:[6,8,10,12,14,16],C60:[6,8,10,12,14,16]},
+
+
+    "HRB400E": {C40:[8,10,12,14,16,20,25,32,40],C45:[8,10,12,14,16,20,25,32,40],C50:[8,10,12,14,16,20,25,32,40],C60:[8,10,12,14,16,20,25,32,40]},
+
+
+    "HRB500E": {C40:[8,10,12,14,16,20,25,32,40],C45:[8,10,12,14,16,20,25,32,40],C50:[8,10,12,14,16,20,25,32,40],C60:[8,10,12,14,16,20,25,32,40]}
+
+
+  };
+
+
+  var validDia = allDia;
+
+
+  if (currentMode === "nuclear" && nuclearDiaMap[steel] && nuclearDiaMap[steel][conc]) {
+
+
+    validDia = nuclearDiaMap[steel][conc];
+
+
+  }
+
+
+  ["pinDia","ancDia","hookDia"].forEach(function(id) {
+
+
+    var inp = document.getElementById(id);
+
+
+    if (!inp) return;
+
+
+    var cur = parseInt(inp.value) || 0;
+
+
+    var min = validDia.length > 0 ? validDia[0] : 6;
+
+
+    var max = validDia.length > 0 ? validDia[validDia.length-1] : 50;
+
+
+    inp.min = min;
+
+
+    inp.max = max;
+
+
+    if (validDia.indexOf(cur) < 0) {
+
+
+      cur = validDia.reduce(function(a,b){return Math.abs(b-cur)<Math.abs(a-cur)?b:a;});
+
+
+      inp.value = cur;
+
+
+    }
+
+
+  });
+
+
+}
+
+
+function updateAncJtypeOptions() {
+
+
+  var sel = document.getElementById("ancJtype");
+
+
+  if (!sel) return;
+
+
+  if (currentMode === "nuclear") {
+
+
+    sel.innerHTML = '<option value="la">锚固长度</option><option value="lap50">搭接（≤50%）</option><option value="lap50plus">搭接（＞50%）</option>';
+
+  } else if (currentMode === "ci") {
+
+
+    sel.innerHTML = '<option value="la">锚固长度</option><option value="lap25">搭接（25%）</option><option value="lap50">搭接（50%）</option><option value="lap100">搭接（100%）</option>';
+
+  } else {
+
+
+    sel.innerHTML = '<option value="la">锚固长度</option><option value="lap25">搭接（25%）</option><option value="lap50">搭接（50%）</option><option value="lap100">搭接（100%）</option>';
+
+  }
+
+
+
+
+
+    var seismicSel = document.getElementById("ancSeismic");
+
+
+    var seismicLabel = document.getElementById("seismicLabel");
+
+
+    if (seismicSel) {
+
+
+      if (currentMode === "gbt") {
+
+
+        seismicSel.style.display = "";
+
+
+        if (seismicLabel) seismicLabel.style.display = "";
+
+
+      } else {
+
+
+        seismicSel.style.display = "none";
+
+
+        if (seismicLabel) seismicLabel.style.display = "none";
+
+
+      }
+
+
+    }
+
+
+  
+
+
+  // Filter concrete grades by mode
+
+
+  var concSel = document.getElementById("ancConc");
+
+
+  if (concSel) {
+
+
+    var savedVal = concSel.value;
+
+
+    if (currentMode === "nuclear") {
+
+
+      concSel.innerHTML = '<option value="C40">C40</option><option value="C45">C45</option><option value="C50">C50</option><option value="C60">C60</option>';
+
+
+    } else if (currentMode === "ci") {
+
+
+      concSel.innerHTML = '<option value="C40">C40</option><option value="C45">C45</option><option value="C50">C50</option><option value="C55">C55</option><option value="C60">C60</option>';
+
+
+    } else {
+
+
+      concSel.innerHTML = '<option value="C25">C25</option><option value="C30">C30</option><option value="C35">C35</option><option value="C40">C40</option><option value="C45">C45</option><option value="C50">C50</option><option value="C55">C55</option><option value="C60">C60</option>';
+
+
+    }
+
+
+    // Restore saved value if still valid
+
+
+    for (var o of concSel.options) { if (o.value === savedVal) { concSel.value = savedVal; break; } }
+
+
+  }
+
+
+}
+
+
+
+
+
+
+
+
+// ============================================================
+
+
+// 查表/计算函数
+
+
+// ============================================================
+
+
+
+
+
+// ---- 弯曲心轴 ----
+
+
+function getPinMM(steel, dia, purpose) {
+
+
+  purpose = purpose || "main";
+
+
+  if (currentMode === "nuclear") {
+
+
+    var d = nuclearPinData[steel];
+
+
+    if (!d) return null;
+
+
+    d = d[purpose];
+
+
+    return d && d[dia] !== undefined ? d[dia] : null;
+
+
+  } else {
+
+
+    return gbtPin(steel, dia);
+
+
+  }
+
+
+}
+
+
+
+
+
+function updatePinResult() {
+
+
+  var steel = document.getElementById("pinSteel").value;
+
+
+  var dia   = parseInt(document.getElementById("pinDia").value) || 0;
+
+
+  var purpose = currentMode === "nuclear"
+
+
+    ? (document.getElementById("pinPurpose") ? document.getElementById("pinPurpose").value : "main")
+
+
+    : "main";
+
+
+  var val = getPinMM(steel, dia, purpose);
+
+
+  var el  = document.getElementById("pinResult");
+
+
+  var note = document.getElementById("pinNote");
+
+
+  if (!val) {
+
+
+    el.textContent = "—"; note.textContent = "无数据，请核对该规格";
+
+
+    return;
+
+
+  }
+
+
+  el.textContent = val;
+
+
+  var src = currentMode === "nuclear" ? "台山核电二期核岛规范" : "22G-101图集";
+
+
+  note.textContent = "来源：" + src + "　用途：" + (purpose === "main" ? "主筋" : "箍筋/拉筋");
+
+
+}
+
+
+
+
+
+// ---- 锚固/搭接长度 ----
+
+
+function getAncMM(steel, dia, conc, jtype) {
+
+
+  conc = conc || "C40"; jtype = jtype || "la";
+
+
+  if (currentMode === "nuclear") {
+
+
+    var d = nuclearAnchData[conc];
+
+
+    if (!d) return null;
+
+
+    d = d[steel];
+
+
+    if (!d) return null;
+
+
+    d = d[dia];
+
+
+    if (!d) return null;
+
+
+    if (jtype === "la") return d[0];
+
+
+    if (jtype === "lap50") return d[1] || d[0];
+
+
+    if (jtype === "lap50plus") return d[2] || d[1] || d[0];
+
+
+    return d[0];
+
+
+
+
+
+  } else if (currentMode === "ci") {
+
+
+    var grp = document.getElementById("ciGroup") ? document.getElementById("ciGroup").value : "G1";
+
+
+    var g = ciAnchData[grp];
+
+
+    if (!g) return null;
+
+
+    g = g[steel];
+
+
+    if (!g) return null;
+
+
+    g = g[conc];
+
+
+    if (!g) return null;
+
+
+    var mult = dia <= 25 ? g.le25 : (g.gt25 !== undefined ? g.gt25 : g.le25);
+
+
+    var ancVal = Math.ceil(dia * mult);
+
+
+    if (jtype === "la") return ancVal;
+
+
+    var ciLapMap = {lap:1.4, lap25:1.2, lap50:1.4, lap100:1.6};
+
+
+    var ciLm = ciLapMap[jtype] || 1.4;
+
+
+    return Math.ceil(ancVal * ciLm);
+
+
+  } else {
+
+
+    // 国标22G-101完整锚固/搭接长度表
+
+
+    return gbtLookup(steel, dia, conc, jtype);
+
+
+  }
+
+
+}
+
+
+
+
+
+function updateAncResult() {
+
+
+  var steel = document.getElementById("ancSteel").value;
+
+
+  var dia   = parseInt(document.getElementById("ancDia").value) || 0;
+
+
+  var conc  = document.getElementById("ancConc").value;
+
+
+  var jtype = document.getElementById("ancJtype").value;
+
+
+  var val   = getAncMM(steel, dia, conc, jtype);
+
+
+  var el    = document.getElementById("ancResult");
+
+
+  var note  = document.getElementById("ancNote");
+
+
+  if (val === null) {
+
+
+    el.textContent = "—"; note.textContent = "无数据，请核对该规格";
+
+
+    return;
+
+
+  }
+
+
+  el.textContent = val;
+
+
+    var jtypeLabel = jtype === "la" ? "锚固长度" : jtype === "lap50" ? "搭接（≤50%）" : jtype === "lap50plus" ? "搭接（＞50%）" : "搭接长度";
+
+
+  var src = currentMode === "nuclear" ? "台山核电二期核岛规范" :
+
+
+            currentMode === "ci" ? "常规岛廊道表（" +
+
+
+            (document.getElementById("ciGroup") && document.getElementById("ciGroup").value === "G2"
+
+
+              ? "第二组" : "第一组") + "）" : "国标22G-101规范表";
+
+
+  note.textContent = "来源：" + src + "　" + jtypeLabel;
+
+
+}
+
+
+
+
+
+// ---- 弯钩外皮尺寸 ----
+
+
+function updateHookResult() {
+
+
+  var steel = document.getElementById("hookSteel").value;
+
+
+  var dia   = parseInt(document.getElementById("hookDia").value) || 0;
+
+
+  var angle = parseInt(document.getElementById("hookAngle").value) || 90;
+
+
+  var el    = document.getElementById("hookResult");
+
+
+  var note  = document.getElementById("hookNote");
+
+
+
+
+
+  if (currentMode === "nuclear") {
+
+
+    var purpose = document.getElementById("pinPurpose") ? document.getElementById("pinPurpose").value : "main";
+
+
+    var D = getPinMM(steel, dia, purpose);
+
+
+    var straight = nuclearHookStraight(steel, angle, dia);
+
+
+    if (!D) { el.textContent = "—"; note.textContent = "无弯曲心轴数据"; return; }
+
+
+    var outer = dia * straight + D / 2 + dia;
+
+
+    outer = Math.round(outer);
+
+
+    el.textContent = outer;
+
+
+    note.textContent = "公式：平直段" + straight + "d + D/2 + d = " + dia + "×" + straight + " + " + D + "/2 + " + dia + " = " + outer + "mm";
+
+
+  } else {
+
+
+    // 常规岛/国标：弯钩平直段参照核岛规范
+
+
+    var straight2 = nuclearHookStraight(steel, angle, dia);
+
+
+    var D2 = gbtPin(steel, dia);
+
+
+    var outer2 = dia * straight2 + D2 / 2 + dia;
+
+
+    outer2 = Math.round(outer2);
+
+
+    el.textContent = outer2;
+
+
+    var src2 = currentMode === "ci" ? "常规岛" : "国标";
+
+
+    note.textContent = src2 + "，平直段" + straight2 + "d，D=" + D2 + "mm，D/2+d=" + Math.round(D2/2+dia) + "mm";
+
+
+  }
+
+
+}
+
+
+
+
+
+// ============================================================
+
+
+// 普通计算器
+
+
+// ============================================================
+
+
+function calcNum(n) {
+
+
+  calcExpr += n;
+
+
+  document.getElementById("calcDisplay").value = calcExpr;
+
+
+}
+
+
+function calcOp(op) {
+
+
+  if (op === "**2") {
+
+
+    calcExpr += "**2";
+
+
+  } else if (op === "**") {
+
+
+    calcExpr += "**";
+
+
+  } else {
+
+
+    calcExpr += op;
+
+
+  }
+
+
+  document.getElementById("calcDisplay").value = calcExpr;
+
+
+}
+
+
+function calcEval() {
+
+
+  try {
+
+
+    var r = eval(calcExpr);
+
+
+    document.getElementById("calcDisplay").value = (typeof r === "number" && isFinite(r)) ? r.toFixed(10).replace(/\.?0+$/, "") : r;
+
+
+    calcExpr = document.getElementById("calcDisplay").value;
+
+
+  } catch(e) {
+
+
+    document.getElementById("calcDisplay").value = "Error";
+
+
+    calcExpr = "";
+
+
+  }
+
+
+}
+
+
+function calcC() { calcExpr = ""; document.getElementById("calcDisplay").value = ""; }
+
+
+function calcBack() {
+
+
+  calcExpr = calcExpr.slice(0, -1);
+
+
+  document.getElementById("calcDisplay").value = calcExpr;
+
+
+}
+
+
+function calcSqrt() {
+
+
+  try {
+
+
+    var r = Math.sqrt(eval(calcExpr));
+
+
+    document.getElementById("calcDisplay").value = isFinite(r) ? r.toFixed(10).replace(/\.?0+$/, "") : "Error";
+
+
+    calcExpr = document.getElementById("calcDisplay").value;
+
+
+  } catch(e) { document.getElementById("calcDisplay").value = "Error"; calcExpr = ""; }
+
+
+}
+
+
+function calcPi() { calcExpr += "3.1415926535"; document.getElementById("calcDisplay").value = calcExpr; }
+
+
+
+
+
+// 键盘支持（仅计算器模式）
+
+
+document.addEventListener("keydown", function(e) {
+
+
+  if (currentMode !== "calc") return;
+
+
+  var k = e.key;
+
+
+  if (/^[0-9.]$/.test(k)) { calcNum(k); e.preventDefault(); }
+
+
+  else if (k === "+") calcOp("+");
+
+
+  else if (k === "-") calcOp("-");
+
+
+  else if (k === "*") calcOp("*");
+
+
+  else if (k === "/") calcOp("/");
+
+
+  else if (k === "(" || k === ")") calcOp(k);
+
+
+  else if (k === "Enter" || k === "=") { calcEval(); e.preventDefault(); }
+
+
+  else if (k === "Backspace") { calcBack(); e.preventDefault(); }
+
+
+  else if (k === "Escape" || k === "Delete") { calcC(); e.preventDefault(); }
+
+
+  else if (k === "s" || k === "S") { calcSqrt(); e.preventDefault(); }
+
+
+});
+
+
+
+
+
+// ============================================================
+
+
+// 初始化
+
+
+// ============================================================
+
+
+(function initApp() {
+
+
+  var saved = localStorage.getItem("rebarCalcMode") || "nuclear";
+
+
+  setMode(saved);
+
+
+})();
+
+
+// PWA Service Worker (offline cache)
+if('serviceWorker' in navigator){
+  var swCode='var CACHE="rebar-calc-v1";self.addEventListener("install",function(e){e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(["/"])}))});self.addEventListener("fetch",function(e){e.respondWith(caches.match(e.request).then(function(r){return r||fetch(e.request)}))});';
+  var swBlob=new Blob([swCode],{type:'application/javascript'});
+  var swUrl=URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl).catch(function(){});
+}
+</script>
+
+
+</body>
+
+
+</html>
+
+
