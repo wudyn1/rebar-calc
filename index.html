@@ -2125,7 +2125,10 @@ document.addEventListener("keydown", function(e) {
 
 // PWA Service Worker
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js').catch(function(err){console.warn('SW registration failed:',err);});
+  navigator.serviceWorker.register('/sw.js')
+    .then(function(reg){document.title='[OK]钢筋翻样计算器';})
+    .catch(function(err){document.title='[SW ERR]钢筋翻样计算器';console.warn(err);});
+navigator.serviceWorker.ready.then(function(){document.title='[就绪]钢筋翻样计算器';});
 }
 </script>
 
