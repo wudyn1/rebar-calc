@@ -38,7 +38,7 @@
 // PWA Manifest
 var link=document.createElement('link');
 link.rel='manifest';
-link.href='/rebar-calc/manifest.json';
+link.href='/manifest.json';
 document.head.appendChild(link);
 </script>
 
@@ -2125,7 +2125,7 @@ document.addEventListener("keydown", function(e) {
 
 // PWA Service Worker
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/rebar-calc/sw.js').catch(function(err){console.warn('SW registration failed:',err);});
+  navigator.serviceWorker.register('/sw.js').catch(function(err){console.warn('SW registration failed:',err);});
 }
 </script>
 
